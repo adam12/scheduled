@@ -189,7 +189,7 @@ class CronParser
 
   def recursive_calculate(meth,time,num)
     array = [time]
-    num.-(1).times do |num|
+    num.-(1).times do
       array << self.send(meth, array.last)
     end
     array
