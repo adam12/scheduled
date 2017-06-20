@@ -8,6 +8,7 @@ Gem::Specification.new do |spec|
 
   spec.summary  = %q(A very lightweight clock process with minimal dependencies and no magic.)
   spec.license  = "MIT"
+  spec.homepage = "https://github.com/adam12/scheduled"
 
   spec.files    = ["README.md"] + Dir["lib/**/*.rb"]
 
