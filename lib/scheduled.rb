@@ -8,9 +8,17 @@ module Scheduled
   module_function
 
   def every(interval, &block)
+    rescued_block = ->() do
+      begin
+        block.call
+      rescue Exception => e
+        Thread.new { raise e }
+      end
+    end
+
     if interval.is_a?(Integer)
       task = Concurrent::TimerTask.new(execution_interval: interval, run_now: true) do
-        block.call
+        rescued_block.call
       end
 
       task.execute
@@ -21,7 +29,7 @@ module Scheduled
         next_tick_delay = parsed_cron.next(Time.now) - Time.now
 
         task = Concurrent::ScheduledTask.execute(next_tick_delay) do
-          block.call
+          rescued_block.call
           run.call
         end
 
@@ -36,7 +44,7 @@ module Scheduled
       task = Concurrent::TimerTask.new(execution_interval: 1, run_now: true) do |timer_task|
         case interval.call(job)
         when true
-          block.call
+          rescued_block.call
 
           job.last_run = Time.now
         when :cancel
