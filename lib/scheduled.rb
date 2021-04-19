@@ -38,9 +38,9 @@ module Scheduled
         run = ->() {
           now = Time.now
           parsed_cron = CronParser.new(interval)
-          next_tick_delay = parsed_cron.next(now) - now
+          next_tick_delay = (parsed_cron.next(now) - now).ceil
 
-          logger.debug { "Next run at #{now + next_tick_delay}" }
+          logger.debug { "Next run at #{now + next_tick_delay} (tick delay of #{next_tick_delay})" }
 
           task = Concurrent::ScheduledTask.execute(next_tick_delay) do
             rescued_block.call
