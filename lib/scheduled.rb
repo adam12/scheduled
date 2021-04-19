@@ -38,7 +38,7 @@ module Scheduled
         run = ->() {
           now = Time.now
           parsed_cron = CronParser.new(interval)
-          next_tick_delay = (parsed_cron.next(now) - now).ceil
+          next_tick_delay = [1, (parsed_cron.next(now) - now).ceil].max
 
           logger.debug { "Next run at #{now + next_tick_delay} (tick delay of #{next_tick_delay})" }
 
