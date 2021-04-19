@@ -4,16 +4,46 @@ require "logger"
 require "concurrent"
 require "scheduled/cron_parser"
 
+##
+# Schedule jobs to run at specific intervals.
+#
 module Scheduled
   Job = Struct.new(:last_run)
 
   module ClassMethods
+    # Assign logger instance.
     attr_writer :logger
 
+    # Logger instance.
+    #
+    # @return [Logger]
     def logger
       @logger ||= Logger.new($stdout, level: :info)
     end
 
+    # Create task to run every interval.
+    #
+    # @param interval [Integer, String, #call]
+    #   Interval to perform task.
+    #
+    #   When provided as an +Integer+, is the number of seconds between task runs.
+    #
+    #   When provided as a +String+, is a cron-formatted interval line.
+    #
+    #   When provided as an object that responds to +#call+, will run when truthy.
+    #
+    # @param name [String, false]
+    #   Name of task, used during logging. Will use block location and line number by
+    #   default. Use +false+ to prevent a name being automatically assigned.
+    #
+    # @return [void]
+    #
+    # @example Run every 60 seconds
+    #   Scheduled.every(60) { puts "Running every 60 seconds" }
+    #
+    # @example Run every day at 9:10 AM
+    #   Scheduled.every("10 9 * * *") { puts "Performing billing" }
+    #
     def every(interval, name: nil, &block)
       logger = logger_for_task(name, block)
 
@@ -73,6 +103,9 @@ module Scheduled
       end
     end
 
+    # Run task scheduler indefinitely.
+    #
+    # @return [void]
     def wait
       trap("INT") { exit }
 
