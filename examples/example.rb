@@ -1,6 +1,8 @@
 #!/usr/bin/env ruby -w
 require "scheduled"
 
+Scheduled.logger.level = :debug
+
 Scheduled.every(5) { puts "Running", Time.now }
 
 two_hours_from_last_run = ->(job) do
