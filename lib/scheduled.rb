@@ -121,7 +121,7 @@ module Scheduled
 
       name ||= block_name(block)
       logger = self.logger.dup
-      logger.progname = name
+      logger.progname = name if logger.respond_to?(:progname=)
       logger
     end
 

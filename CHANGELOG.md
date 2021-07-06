@@ -12,6 +12,7 @@
   they originally ran.
 - Raised exceptions are re-raised in new `Thread`. This is
   to work around `concurrent-ruby` wanting to swallow exceptions.
+- Logger without `progname=` method is no longer a failure.
 
 ## 0.1.0 (2017-06-20)
 - Initial release
