@@ -25,8 +25,8 @@ module Scheduled
   class << self
     # An object that when called creates a logger for the provided task
     #
-    # @return [#info, #debug]
-    #   a +Logger+ like instance which reponds to  +info+ and +debug+
+    # @return [#call(original_logger, task_name)]
+    #   a callable object that returns a a +Logger+ like instance which responds to +info+ and +debug+
     # @example
     #   Scheduled.task_logger = ->(original_logger, task_name) {
     #     logger = original_logger.dup
