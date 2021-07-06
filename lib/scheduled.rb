@@ -18,9 +18,10 @@ module Scheduled
   }
   private_constant :DEFAULT_TASK_LOGGER
 
-  class << self
-    @task_logger = DEFAULT_TASK_LOGGER
+  @task_logger = DEFAULT_TASK_LOGGER
+  @logger = Logger.new($stdout, level: :info)
 
+  class << self
     # Create a logger for the provided task
     #
     # @overload task_logger=(value)
@@ -36,18 +37,10 @@ module Scheduled
     #     logger
     #   }
     attr_accessor :task_logger
-  end
 
-  module ClassMethods
-    # Assign logger instance.
-    attr_writer :logger
-
-    # Logger instance.
-    #
-    # @return [Logger]
-    def logger
-      @logger ||= Logger.new($stdout, level: :info)
-    end
+    # A +Logger+ like instance which responds to +info+ and +debug+ 
+    # @return [#info, #debug]
+    attr_accessor :logger
 
     # Create task to run every interval.
     #
@@ -158,6 +151,4 @@ module Scheduled
       "#{file}:#{line}"
     end 
   end
-
-  extend ClassMethods
 end
