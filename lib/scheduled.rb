@@ -10,6 +10,34 @@ require "scheduled/cron_parser"
 module Scheduled
   Job = Struct.new(:last_run)
 
+  # Default task logger implementation
+  DEFAULT_TASK_LOGGER = ->(logger, name) {
+    logger = logger.dup
+    logger.progname = name if logger.respond_to?(:progname=)
+    logger
+  }
+  private_constant :DEFAULT_TASK_LOGGER
+
+  class << self
+    @task_logger = DEFAULT_TASK_LOGGER
+
+    # Create a logger for the provided task
+    #
+    # @overload task_logger=(value)
+    # @param value [#call(Object, String)]
+    #   A callable object which accepts the original logger and the task name as arguments
+    #   and returns a Logger-like object.
+    # @return [#info, #debug]
+    #   an object that is similar to a stdlib +Logger+ instance (responding to +info+, +debug+, etc).
+    # @example
+    #   Scheduled.task_logger = ->(original_logger, task_name) {
+    #     logger = original_logger.dup
+    #     logger.progname = task_name
+    #     logger
+    #   }
+    attr_accessor :task_logger
+  end
+
   module ClassMethods
     # Assign logger instance.
     attr_writer :logger
@@ -116,13 +144,12 @@ module Scheduled
 
     private
 
+    # Build a logger for the current task
     def logger_for_task(name, block)
       return logger if name == false
 
       name ||= block_name(block)
-      logger = self.logger.dup
-      logger.progname = name if logger.respond_to?(:progname=)
-      logger
+      task_logger.call(logger, name)
     end
 
     # Generate name for block

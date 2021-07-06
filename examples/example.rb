@@ -2,8 +2,13 @@
 require "scheduled"
 
 Scheduled.logger.level = :debug
+Scheduled.task_logger = ->(logger, name) {
+  logger = logger.dup
+  logger.progname = name
+  logger
+}
 
-Scheduled.every(5) { puts "Running", Time.now }
+Scheduled.every(5) { puts "Running: #{Time.now}" }
 
 two_hours_from_last_run = ->(job) do
   Time.now - job.last_run >= 60*60*2
