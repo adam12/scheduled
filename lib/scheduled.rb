@@ -22,14 +22,10 @@ module Scheduled
   @logger = Logger.new($stdout, level: :info)
 
   class << self
-    # Create a logger for the provided task
+    # An object that when called creates a logger for the provided task
     #
-    # @overload task_logger=(value)
-    # @param value [#call(Object, String)]
-    #   A callable object which accepts the original logger and the task name as arguments
-    #   and returns a Logger-like object.
     # @return [#info, #debug]
-    #   an object that is similar to a stdlib +Logger+ instance (responding to +info+, +debug+, etc).
+    #   a +Logger+ like instance which reponds to  +info+ and +debug+
     # @example
     #   Scheduled.task_logger = ->(original_logger, task_name) {
     #     logger = original_logger.dup
@@ -38,8 +34,8 @@ module Scheduled
     #   }
     attr_accessor :task_logger
 
-    # A +Logger+ like instance which responds to +info+ and +debug+ 
     # @return [#info, #debug]
+    #   a +Logger+ like instance which responds to +info+ and +debug+
     attr_accessor :logger
 
     # Create task to run every interval.
