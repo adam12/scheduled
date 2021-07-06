@@ -8,6 +8,7 @@ require "scheduled/cron_parser"
 # Schedule jobs to run at specific intervals.
 #
 module Scheduled
+  # @api private
   Job = Struct.new(:last_run)
 
   # Default task logger implementation
@@ -134,6 +135,7 @@ module Scheduled
     private
 
     # Build a logger for the current task
+    # @api private
     def logger_for_task(name, block)
       return logger if name == false
 
@@ -142,6 +144,7 @@ module Scheduled
     end
 
     # Generate name for block
+    # @api private
     def block_name(block)
       file, line = block.source_location
       "#{file}:#{line}"
