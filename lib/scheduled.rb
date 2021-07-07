@@ -11,6 +11,10 @@ module Scheduled
   # @api private
   Job = Struct.new(:last_run)
 
+  # Context the job is run in
+  # @api private
+  Context = Struct.new(:logger)
+
   # Default task logger implementation
   DEFAULT_TASK_LOGGER = ->(logger, name) {
     logger = logger.dup
@@ -64,10 +68,11 @@ module Scheduled
     #
     def every(interval, name: nil, &block)
       logger = logger_for_task(name, block)
+      context = Context.new(logger)
 
       rescued_block = ->() do
         begin
-          block.call
+          context.instance_eval(&block)
         rescue Exception => e
           Thread.new { raise e }
         end
