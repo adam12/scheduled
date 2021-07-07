@@ -3,6 +3,7 @@
 require "logger"
 require "concurrent"
 require "scheduled/cron_parser"
+require "scheduled/instrumenters"
 
 ##
 # Schedule jobs to run at specific intervals.
@@ -25,6 +26,7 @@ module Scheduled
 
   @task_logger = DEFAULT_TASK_LOGGER
   @logger = Logger.new($stdout, level: :info)
+  @instrumenter = Instrumenters::Noop
 
   class << self
     # An object that when called creates a logger for the provided task
@@ -42,6 +44,10 @@ module Scheduled
     # @return [#info, #debug]
     #   a +Logger+ like instance which responds to +info+ and +debug+
     attr_accessor :logger
+
+    # @return [#instrument]
+    #   an +ActiveSupport::Notifications+ like object which responds to +instrument+
+    attr_accessor :instrumenter
 
     # Create task to run every interval.
     #
@@ -67,14 +73,21 @@ module Scheduled
     #   Scheduled.every("10 9 * * *") { puts "Performing billing" }
     #
     def every(interval, name: nil, &block)
+      name ||= block_name(block)
       logger = logger_for_task(name, block)
       context = Context.new(logger)
 
       rescued_block = ->() do
-        begin
-          context.instance_eval(&block)
-        rescue Exception => e
-          Thread.new { raise e }
+        instrumenter.instrument("scheduled.run", {name: name}) do |payload|
+          begin
+            result = context.instance_eval(&block)
+            payload[:result] = result
+            result
+          rescue Exception => e
+            payload[:exception] = [e.class.to_s, e.message]
+            payload[:exception_object] = e
+            Thread.new { raise e }
+          end
         end
       end
 
@@ -144,7 +157,6 @@ module Scheduled
     def logger_for_task(name, block)
       return logger if name == false
 
-      name ||= block_name(block)
       task_logger.call(logger, name)
     end
 

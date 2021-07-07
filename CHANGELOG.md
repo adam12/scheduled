@@ -15,6 +15,7 @@
 - Logger without `progname=` method is no longer a failure.
 - Job blocks are evaluated inside their own context with a logger available
   to them.
+- Job execution is instrumented using an `ActiveSupport::Notifications` style of interface.
 
 ## 0.1.0 (2017-06-20)
 - Initial release
