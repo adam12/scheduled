@@ -86,7 +86,7 @@ module Scheduled
             result = context.instance_eval(&block)
             payload[:result] = result
             result
-          rescue Exception => e
+          rescue => e
             payload[:exception] = [e.class.to_s, e.message]
             payload[:exception_object] = e
 
