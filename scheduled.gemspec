@@ -13,5 +13,4 @@ Gem::Specification.new do |spec|
   spec.files    = ["README.md"] + Dir["lib/**/*.rb"]
 
   spec.add_dependency "concurrent-ruby", "~> 1.0"
-  spec.add_development_dependency "rubygems-tasks", "~> 0.2"
 end
