@@ -1,6 +1,8 @@
 # Changelog
 
 ## master
+
+## 0.2.0 (2023-09-09)
 - `Scheduled` is no longer an includable module. The class interface is the only
   interface.
 - A default `Logger` is provided but is silent by default.
