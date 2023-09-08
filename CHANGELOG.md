@@ -10,12 +10,12 @@
 - Cron-style tasks have a minimum 1 second next-tick. They
   should never be scheduled within the same second that
   they originally ran.
-- Raised exceptions are re-raised in new `Thread`. This is
-  to work around `concurrent-ruby` wanting to swallow exceptions.
 - Logger without `progname=` method is no longer a failure.
 - Job blocks are evaluated inside their own context with a logger available
   to them.
 - Job execution is instrumented using an `ActiveSupport::Notifications` style of interface.
+- No longer rescue `Exception` class
+- Customizable error notifier hook called when exceptions are rescued
 
 ## 0.1.0 (2017-06-20)
 - Initial release
