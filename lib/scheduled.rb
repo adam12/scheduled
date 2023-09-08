@@ -49,6 +49,9 @@ module Scheduled
     #   an +ActiveSupport::Notifications+ like object which responds to +instrument+
     attr_accessor :instrumenter
 
+    # An object that responds to +call+ and receives an exception as an argument.
+    attr_accessor :error_notifier
+
     # Create task to run every interval.
     #
     # @param interval [Integer, String, #call]
@@ -86,7 +89,10 @@ module Scheduled
           rescue Exception => e
             payload[:exception] = [e.class.to_s, e.message]
             payload[:exception_object] = e
-            Thread.new { raise e }
+
+            if error_notifier
+              error_notifier.call(e)
+            end
           end
         end
       end
@@ -166,5 +172,9 @@ module Scheduled
       file, line = block.source_location
       "#{file}:#{line}"
     end 
+  end
+
+  Scheduled.error_notifier = proc do |error|
+    $stderr.puts error.full_message
   end
 end
