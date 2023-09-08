@@ -4,3 +4,4 @@ gemspec
 
 gem "yard"
 gem "webrick"
+gem "rake"
